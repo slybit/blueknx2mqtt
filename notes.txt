@@ -1,0 +1,2 @@
+mosquitto_sub -h 192.168.1.200 -t knx
+mosquitto_pub -h 192.168.1.200 -t knx -m hallo
