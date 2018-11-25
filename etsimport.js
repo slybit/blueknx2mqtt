@@ -7,10 +7,9 @@ const fs = require('fs');
 const dptRegExp = new RegExp('DPS?T\\-(\\d+)(\\-(\\d+))?');
 
 function parseDPT(dpt) {
-    if (subs[k].attributes.DPTs !== undefined) {
+    if (dpt !== undefined) {
         var match = dptRegExp.exec(dpt);
         if (match === undefined || match == null) {
-            logger.warn("Unrecognized datapoint %s", dpt);
             return undefined;
         } else {
             return 'DPT' + match[1] + (match[3] !== undefined ? '.' + match[3].padStart(3,0) : '');
@@ -19,11 +18,13 @@ function parseDPT(dpt) {
 }
 
 exports.parse = function (etsFile, logger) {
-    var map = {}
+    var map = {};
+    map.nameToGA = new Map();
+    map.GAToname = new Map();
     var main = null;
     var middle = null;
-    
-    var raw = fs.readFileSync(etsFile);
+
+    var raw = fs.readFileSync(etsFile, 'utf8');
 
     var lines = raw.split(/\r\n|\n/);
 
@@ -34,18 +35,20 @@ exports.parse = function (etsFile, logger) {
 
     for (i=0; i<lines.length; i++) {
         if (lines[i].trim() != '') {
-            var data = lines[i].split(',');            
+            var data = lines[i].split(',');
             if (data[0].trim() != '')
-                main = data[0].slice(1,-1);
+                main = data[0].slice(1,-1).replace(/\s/g, '_');
             else if (data[1].trim() != '')
-                middle = data[1].slice(1,-1);
+                middle = data[1].slice(1,-1).replace(/\s/g, '_');
             else {
-                var name = main+"-"+middle+"-"+data[2].slice(1,-1);
+                var sub = data[2].slice(1,-1).replace(/\s/g, '_');
+                var name = main+"-"+middle+"-"+sub;
                 var ga = data[3].slice(1,-1);
                 var dpt = parseDPT(data[7].slice(1,-1));
+                if (!dpt) logger.warn("Unrecognized datapoint [%s] for GA %s", dpt, ga);
                 map.nameToGA.set(name, {'ga': ga, 'dpt': dpt});
                 map.GAToname.set(ga, {'name': name, 'dpt': dpt});
-                console.log("Added " + name+ga+dpt);
+                logger.silly("Added " + name+ga+dpt);
             }
         }
     }

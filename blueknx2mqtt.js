@@ -16,6 +16,10 @@ const logger = createLogger({
     transports: [new transports.Console()]
 });
 
+// Parse the ETS export
+const ets = require('./etsimport.js').parse(config.knx.etsExport, logger);
+
+/*
 let knxConnection = knx.Connection(Object.assign({
     handlers: {
         connected: function() {
@@ -32,3 +36,4 @@ let knxConnection = knx.Connection(Object.assign({
             logger.info(payload.value);
         }
   }}, config.knx.options))
+  */

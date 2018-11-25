@@ -12,9 +12,9 @@ exports.parse = function () {
         }
     } else {
         return {
-            loglevel: 'info',
+            loglevel: 'silly',
             knx: {
-                etsExport: 'ets_export.csv'
+                etsExport: 'etsexport.csv'
             },
             mqtt: {
                 url: 'mqtt://localhost',
