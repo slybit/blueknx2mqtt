@@ -43,11 +43,11 @@ exports.parse = function (etsFile, logger) {
                 middle = data[1].slice(1,-1).replace(/\s/g, '_').replace(/\//g, '_');
             else {
                 var sub = data[2].slice(1,-1).replace(/\s/g, '_').replace(/\//g, '_');
-                var name = main+"-"+middle+"-"+sub;
+                var name = main+"/"+middle+"/"+sub;
                 var ga = data[3].slice(1,-1);
                 var dpt = parseDPT(data[7].slice(1,-1));
                 if (!dpt) logger.warn("Unrecognized datapoint [%s] for GA %s", dpt, ga);
-                map.nameToGA.set(name, {'ga': ga});
+                map.nameToGA.set(name, ga);
                 map.GAToname.set(ga, {'main': main, "middle": middle, "sub": sub, 'dpt': dpt} );
                 map.GAToPrev.set(ga, {'prev': undefined, 'lastChange': undefined} );
                 //logger.silly("Added %s %s %s", name, ga, dpt);
