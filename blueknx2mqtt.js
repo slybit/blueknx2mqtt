@@ -4,9 +4,7 @@ const knx = require('knx');
 const { createLogger, format, transports } = require('winston');
 const DPTLib = require('knx/src/dptlib');
 const config = require('./config.js').parse();
-var log = require('log-driver').logger;
-
-log.trace('shit');
+const mqtt = require('mqtt');
 
 // Initate the logger
 const logger = createLogger({
@@ -33,10 +31,19 @@ let handleKNXEvent = function(evt, src, dst, value) {
     };
     enrichPayload(payload, value);    
     if (evt === 'GroupValue_Response') payload.response = true;
-    let mqttMessage = JSON.stringify(payload);
+    
     logger.verbose("%s **** KNX EVENT: %s, dst: %s, value: %j",
       new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''),
       evt, dst, payload);
+    
+    let mqttMessage = JSON.stringify(payload);
+    let options = {'retain' : true};
+    mqttClient.publish(config.mqtt.topicPrefix + "/status/" + dst, mqttMessage);
+    if (payload.sub) {
+        let topic = config.mqtt.topicPrefix + "/status/" + payload.main + "/" + payload.middle + "/" + payload.sub;
+        mqttClient.publish(topic, mqttMessage);
+        console.log(topic);
+    }
 }
 
 let updatePrev = function(payload, apdu) {    
@@ -83,8 +90,30 @@ let enrichPayload = function(payload, apdu) {
     }    
 }
 
+let mqttClient  = mqtt.connect(config.mqtt.url, config.mqtt.options);
 
-handleKNXEvent('GroupValue_Write', "1.1.1", "0/0/108", Buffer.from('01', 'hex'));
+mqttClient.on('connect', function () {
+    logger.info('MQTT connected');
+    mqttClient.subscribe(config.mqtt.topicPrefix + '/write/+/+/+');
+    mqttClient.subscribe(config.mqtt.topicPrefix + '/read/+/+/+');
+});
+
+mqttClient.on('close', function () {
+    logger.info('MQTT disconnected');
+});
+
+mqttClient.on('reconnect', function () {
+    logger.info('MQTT trying to reconnect');
+});
+
+mqttClient.on('message', function (topic, message) {
+    logger.silly('Received MQTT message on topic %s with value %s', topic, message);
+});
+
+setTimeout(function() {
+    handleKNXEvent('GroupValue_Write', "1.1.1", "0/0/108", Buffer.from('01', 'hex'));
+}, 1000);
+
 
 setTimeout(function() {
     handleKNXEvent('GroupValue_Write', "1.1.1", "0/0/108", Buffer.from('00', 'hex'));

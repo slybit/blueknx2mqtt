@@ -11,7 +11,7 @@ knx:
       ipPort: 3671
 mqtt:
     # URL to MQTT broker
-    url: 'mqtt://localhost'
+    url: 'mqtt://192.168.1.200'
     # Configuration passed to the MQTT library
     options:
         username: 'mqtt_username'
