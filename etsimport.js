@@ -21,6 +21,7 @@ exports.parse = function (etsFile, logger) {
     var map = {};
     map.nameToGA = new Map();
     map.GAToname = new Map();
+    map.GAToPrev = new Map();
     var main = null;
     var middle = null;
 
@@ -46,8 +47,9 @@ exports.parse = function (etsFile, logger) {
                 var ga = data[3].slice(1,-1);
                 var dpt = parseDPT(data[7].slice(1,-1));
                 if (!dpt) logger.warn("Unrecognized datapoint [%s] for GA %s", dpt, ga);
-                map.nameToGA.set(name, {'ga': ga, 'dpt': dpt});
-                map.GAToname.set(ga, {'main': main, "middle": middle, "sub": sub, 'dpt': dpt});
+                map.nameToGA.set(name, {'ga': ga});
+                map.GAToname.set(ga, {'main': main, "middle": middle, "sub": sub, 'dpt': dpt} );
+                map.GAToPrev.set(ga, {'prev': undefined, 'lastChange': undefined} );
                 logger.silly("Added %s %s %s", name, ga, dpt);
             }
         }
