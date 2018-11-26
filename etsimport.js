@@ -47,9 +47,11 @@ exports.parse = function (etsFile, logger) {
                 var dpt = parseDPT(data[7].slice(1,-1));
                 if (!dpt) logger.warn("Unrecognized datapoint [%s] for GA %s", dpt, ga);
                 map.nameToGA.set(name, {'ga': ga, 'dpt': dpt});
-                map.GAToname.set(ga, {'name': name, 'dpt': dpt});
-                logger.silly("Added " + name+ga+dpt);
+                map.GAToname.set(ga, {'main': main, "middle": middle, "sub": sub, 'dpt': dpt});
+                logger.silly("Added %s %s %s", name, ga, dpt);
             }
         }
     }
+    logger.info("Loaded %d datapoints", map.nameToGA.size);
+    return map;
 }
