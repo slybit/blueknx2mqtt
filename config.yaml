@@ -1,5 +1,5 @@
 # One of 'error', 'warn', 'info', 'verbose', debug', 'silly'
-loglevel: 'silly'
+loglevel: 'verbose'
 # Ignore unknown group addresses
 ignoreUnknownGroupAddresses: false
 knx:
@@ -7,7 +7,7 @@ knx:
     etsExport: 'etsexport.csv'
     # Configuration passed to the KNX library
     options:
-      ipAddr: '192.168.1.150' 
+      ipAddr: '192.168.1.150'
       ipPort: 3671
 mqtt:
     # URL to MQTT broker

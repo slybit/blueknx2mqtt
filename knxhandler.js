@@ -3,14 +3,14 @@ function KnxHandler(config, map, mqttClient, logger) {
     if (!(this instanceof KnxHandler)) {
       return new KnxHandler(config, map, mqttClient, logger);
     }
-  
+
     this.config = config;
     this.map = map;
     this.mqttClient = mqttClient;
     this.logger = logger;
 };
-  
-  
+
+
 
 KnxHandler.prototype.handleKNXEvent = function(evt, src, dst, value) {
     this.logger.silly("onKnxEvent %s, %s, %j", evt, dst, value);
@@ -19,27 +19,25 @@ KnxHandler.prototype.handleKNXEvent = function(evt, src, dst, value) {
     }
     let payload = {
         'srcphy': src,
-        'dstgad': dst        
+        'dstgad': dst
     };
-    this.enrichPayload(payload, value);    
+    this.enrichPayload(payload, value);
     if (evt === 'GroupValue_Response') payload.response = true;
-    
-    this.logger.verbose("%s **** KNX EVENT: %s, dst: %s, value: %j",
+
+    this.logger.verbose("%s KNX->MQTT: %s, dst: %s, value: %j",
       new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''),
       evt, dst, payload);
-    
+
     let mqttMessage = JSON.stringify(payload);
-    let options = {'retain' : true};
-    this.mqttClient.publish(this.config.mqtt.topicPrefix + "/status/" + dst, mqttMessage);
+    this.mqttClient.publish(this.config.mqtt.topicPrefix + "/status/" + dst, mqttMessage, {'retain' : true});
     if (payload.sub) {
         let topic = this.config.mqtt.topicPrefix + "/status/" + payload.main + "/" + payload.middle + "/" + payload.sub;
-        this.mqttClient.publish(topic, mqttMessage);
-        console.log(topic);
+        this.mqttClient.publish(topic, mqttMessage, {'retain' : true});
     }
 }
 
-KnxHandler.prototype.updatePrev = function(payload, apdu) {    
-    let info = this.map.GAToPrev.get(payload.dstgad);    
+KnxHandler.prototype.updatePrev = function(payload, apdu) {
+    let info = this.map.GAToPrev.get(payload.dstgad);
     if (info === undefined) {
         this.map.GAToPrev.set(payload.dstgad, {'prev': undefined, 'lastChange': undefined} );
     }
@@ -54,12 +52,12 @@ KnxHandler.prototype.enrichPayload = function(payload, apdu) {
     // time stamps
     payload.lc = this.updatePrev(payload, apdu);
     payload.ts = (new Date).getTime();
-    // value 
+    // value
     let info = this.map.GAToname.get(payload.dstgad);
     if (info === undefined) {
         payload.value = '0x'+apdu.toString('hex');
         payload.raw = true; // indication that payload is raw binary value
-    } else {        
+    } else {
         payload.dpt = info.dpt;
         payload.main = info.main;
         payload.middle = info.middle;
@@ -79,7 +77,7 @@ KnxHandler.prototype.enrichPayload = function(payload, apdu) {
             payload.value = 1;
         else if (payload.value === false)
             payload.value = 0;
-    }    
+    }
 }
-  
+
 module.exports = KnxHandler;

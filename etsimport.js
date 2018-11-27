@@ -50,7 +50,7 @@ exports.parse = function (etsFile, logger) {
                 map.nameToGA.set(name, ga);
                 map.GAToname.set(ga, {'main': main, "middle": middle, "sub": sub, 'dpt': dpt} );
                 map.GAToPrev.set(ga, {'prev': undefined, 'lastChange': undefined} );
-                //logger.silly("Added %s %s %s", name, ga, dpt);
+                logger.silly("Added %s %s %s", name, ga, dpt);
             }
         }
     }
