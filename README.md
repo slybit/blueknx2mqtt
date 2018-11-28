@@ -110,7 +110,7 @@ Type        |   Example     |   Explanation
 ----        |   ----        |   -----------
 **raw**     |   "0x01+1"    |   Binary data as hex string, together with the actual length, separated with '+'. This example sends a single bit to KNX with value '1'.
 **raw**     |   "0x07A4+16" |   Sends a 16 bit value to KNX.
-**raw**     |   "0x07"      |   If no bitlength is provided, the full byte value is send. This example sends an 8 bit value to KNX. 
+**raw**     |   "0x07"      |   If no bitlength is provided, the full byte value is sent. This example sends an 8 bit value to KNX. 
 **simple**  |   "10.5"      |   Provided value is translated using the DPT from the ETS export. If no DPT is known, no message is sent.
 
 **Important:** Raw hexadecimal strings must indicate a *byte* array, so number of hexadecimal characters must be *even*.
