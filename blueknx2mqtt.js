@@ -2,7 +2,6 @@
 
 const knx = require('knx');
 const { createLogger, format, transports } = require('winston');
-const DPTLib = require('knx/src/dptlib');
 const config = require('./config.js').parse();
 const mqtt = require('mqtt');
 const KnxHandler = require('./knxhandler');

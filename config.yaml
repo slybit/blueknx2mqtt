@@ -1,7 +1,5 @@
 # One of 'error', 'warn', 'info', 'verbose', debug', 'silly'
 loglevel: 'verbose'
-# Ignore unknown group addresses
-ignoreUnknownGroupAddresses: false
 knx:
     # ETS exported group addresses
     etsExport: 'etsexport.csv'

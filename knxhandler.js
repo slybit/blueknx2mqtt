@@ -1,3 +1,5 @@
+const DPTLib = require('knx/src/dptlib');
+
 function KnxHandler(config, map, mqttClient, logger) {
 
     if (!(this instanceof KnxHandler)) {
@@ -69,6 +71,7 @@ KnxHandler.prototype.enrichPayload = function(payload, apdu) {
             }
             payload.value = DPTLib.fromBuffer(apdu, dpt);
         } catch (err) {
+            console.log(err);
             payload.value = '0x'+apdu.toString('hex');
             payload.raw = true;
         }
