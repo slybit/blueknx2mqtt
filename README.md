@@ -49,7 +49,7 @@ main                |   Main level GA name if provided in ETS export, not presen
 middle              |   ...
 sub                 |   ...
 dpt                 |   Datapoint type of GA if provided in ETS export, not present otherwise
-value               |   Translated value of the KNX data (if DPT known through the ETS export), or
+val                 |   Translated value of the KNX data (if DPT known through the ETS export), or
                     |   raw binary data as hex string (e.g., 0x07A4)
 raw                 |   "true" if value is a raw hex string, not present otherwise   
 
@@ -66,7 +66,7 @@ Example of message object in case the ETS export contains all information for th
     'middle'    :   'Set',
     'sub'       :   'Bathroom',
     'dpt'       :   'DPT1.001',
-    'value'     :   1
+    'val'       :   1
 }
 ```
 
@@ -77,7 +77,7 @@ Example of message object in case the ETS export contains no information about t
     'dstgad'    :   '0/1/2',
     'ts'        :   1543434592311,
     'lc'        :   1543434590311,
-    'value'     :   '0x01',
+    'val'       :   '0x01',
     'raw'       :   'true'
 }
 ```

@@ -57,7 +57,7 @@ KnxHandler.prototype.enrichPayload = function(payload, apdu) {
     // value
     let info = this.map.GAToname.get(payload.dstgad);
     if (info === undefined) {
-        payload.value = '0x'+apdu.toString('hex');
+        payload.val = '0x'+apdu.toString('hex');
         payload.raw = true; // indication that payload is raw binary value
     } else {
         payload.dpt = info.dpt;
@@ -69,17 +69,17 @@ KnxHandler.prototype.enrichPayload = function(payload, apdu) {
             if (dpt.subtype) {
                 payload.unit = dpt.subtype.unit;
             }
-            payload.value = DPTLib.fromBuffer(apdu, dpt);
+            payload.val = DPTLib.fromBuffer(apdu, dpt);
         } catch (err) {
             console.log(err);
-            payload.value = '0x'+apdu.toString('hex');
+            payload.val = '0x'+apdu.toString('hex');
             payload.raw = true;
         }
         // replace true/false with 1/0
-        if (payload.value === true)
-            payload.value = 1;
-        else if (payload.value === false)
-            payload.value = 0;
+        if (payload.val === true)
+            payload.val = 1;
+        else if (payload.val === false)
+            payload.val = 0;
     }
 }
 
