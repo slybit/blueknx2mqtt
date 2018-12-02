@@ -62,7 +62,7 @@ mqttClient.on('connect', function () {
 });
 
 mqttClient.on('close', function () {
-    logger.info('MQTT disconnected');
+    logger.warn('MQTT disconnected');
 });
 
 mqttClient.on('reconnect', function () {
@@ -95,7 +95,6 @@ setTimeout(function() {
  * Checks every 30 seconds if the knx.js is still connected. If not, it forces a reconnect attempt.
  */
 var timerID = setInterval(function() {
-    console.log(knxConnection.state);
     if (knxConnection.state === 'uninitialized')
         knxConnection.emit('disconnected');
 }, 30000);
