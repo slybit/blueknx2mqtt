@@ -18,6 +18,9 @@ const logger = createLogger({
     transports: [new transports.Console()]
 });
 
+// Add last will to mqtt.options
+if (!mqtt.options) mqtt.options = {};
+mqtt.options.will = {topic: config.mqtt.topicPrefix + '/connected', payload: '0', retain: true};
 
 
 // Parse the ETS export
@@ -37,13 +40,17 @@ let knxConnection = knx.Connection(Object.assign({
         error: function(msg) {
             logger.warn('KNX disconnected');
             mqttClient.publish(config.mqtt.topicPrefix + "/connected", "1", {'retain' : true});
+            knxConnection.transition('connecting');
+        },
+        disconnected: function() {
+            logger.warn('KNX disconnected');
+            mqttClient.publish(config.mqtt.topicPrefix + "/connected", "1", {'retain' : true});
+            knxConnection.transition('connecting');
         }
   }}, config.knx.options))
 
 let knxHandler = new KnxHandler(config, map, mqttClient, logger);
 let mqttHandler = new MqttHandler(config, map, knxConnection, logger);
-
-
 
 mqttClient.on('connect', function () {
     logger.info('MQTT connected');
@@ -83,4 +90,12 @@ setTimeout(function() {
 
 
 
-
+/*
+ * Kind of hacky way to keep knx.js reconnecting. This will no longer be required once my pull request has been approved in the knx.js library.
+ * Checks every 30 seconds if the knx.js is still connected. If not, it forces a reconnect attempt.
+ */
+var timerID = setInterval(function() {
+    console.log(knxConnection.state);
+    if (knxConnection.state === 'uninitialized')
+        knxConnection.emit('disconnected');
+}, 30000);
