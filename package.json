@@ -11,6 +11,7 @@
   },
   "devDependencies": {},
   "scripts": {
+    "start": "node blueknx2mqtt.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
