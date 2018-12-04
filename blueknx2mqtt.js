@@ -28,6 +28,7 @@ const map = require('./etsimport.js').parse(config.knx.etsExport, logger);
 
 let publishKnxState = function(state) {
     mqttClient.publish(config.mqtt.topicPrefix + "/connected", state, {'retain' : true});
+    logger.info('published connected state: %s', state);
 }
 
 let mqttClient = mqtt.connect(config.mqtt.url, config.mqtt.options);
@@ -36,7 +37,7 @@ let knxConnection = knx.Connection(Object.assign({
     handlers: {
         connected: function() {
             logger.info('KNX connected');
-            knxConnection._state = 2;
+            knxConnection._state = "2";
             publishKnxState(knxConnection._state);
         },
         event: function (evt, src, dst, value) {
@@ -44,13 +45,13 @@ let knxConnection = knx.Connection(Object.assign({
         },
         error: function(msg) {
             logger.warn('KNX disconnected');
-            knxConnection._state = 2;
+            knxConnection._state = "1";
             publishKnxState(knxConnection._state);
             knxConnection.transition('connecting');
         },
         disconnected: function() {
             logger.warn('KNX disconnected');
-            knxConnection._state = 2;
+            knxConnection._state = "1";
             publishKnxState(knxConnection._state);
             knxConnection.transition('connecting');
         }
@@ -66,7 +67,9 @@ mqttClient.on('connect', function () {
     mqttClient.subscribe(config.mqtt.topicPrefix + '/get/+/+/+');
     mqttClient.subscribe(config.mqtt.topicPrefix + '/set/+/+/+');
     mqttClient.subscribe(config.mqtt.topicPrefix + '/toggle/+/+/+');
-    if (knxConnection._state !== undefined) publishKnxState(knxConnection._state);
+    if (knxConnection._state !== undefined) {
+        publishKnxState(knxConnection._state);
+    }
 
 });
 
