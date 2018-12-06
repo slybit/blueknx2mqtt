@@ -38,11 +38,11 @@ exports.parse = function (etsFile, logger) {
         if (lines[i].trim() != '') {
             var data = lines[i].split(',');
             if (data[0].trim() != '')
-                main = data[0].slice(1,-1).replace(/\s/g, '_').replace(/\//g, '_');
+                main = data[0].slice(1,-1).replace(/\s/g, '_').replace(/\//g, '_').replace(/\+/g, '_');
             else if (data[1].trim() != '')
-                middle = data[1].slice(1,-1).replace(/\s/g, '_').replace(/\//g, '_');
+                middle = data[1].slice(1,-1).replace(/\s/g, '_').replace(/\//g, '_').replace(/\+/g, '_');
             else {
-                var sub = data[2].slice(1,-1).replace(/\s/g, '_').replace(/\//g, '_');
+                var sub = data[2].slice(1,-1).replace(/\s/g, '_').replace(/\//g, '_').replace(/\+/g, '_');
                 var name = main+"/"+middle+"/"+sub;
                 var ga = data[3].slice(1,-1);
                 var dpt = parseDPT(data[7].slice(1,-1));
