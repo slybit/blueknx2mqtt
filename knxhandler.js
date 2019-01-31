@@ -70,6 +70,10 @@ KnxHandler.prototype.enrichPayload = function(payload, apdu) {
                 payload.unit = dpt.subtype.unit;
             }
             payload.val = DPTLib.fromBuffer(apdu, dpt);
+            // do some postprocessing on the val
+            if (payload.val instanceof Date) {
+                payload.val = payload.val.toLocaleDateString();
+            }
         } catch (err) {
             console.log(err);
             payload.val = '0x'+apdu.toString('hex');
