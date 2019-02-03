@@ -5,7 +5,7 @@
   "main": "blueknx2mqtt.js",
   "dependencies": {
     "js-yaml": "^3.12.0",
-    "knx": "file:./local_modules/knx-2.3.1.tgz",
+    "knx": "^2.3.2",
     "mqtt": "^2.18.8",
     "winston": "^3.1.0"
   },
