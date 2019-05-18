@@ -4,7 +4,7 @@ A node.js application that bridges KNX and MQTT.
 
 It connects to a KNX IP gateway (including knxd) and a MQTT broker. It forwards messages both ways.
 
-It follows the design guidelines specified here: https://github.com/mqtt-smarthome/mqtt-smarthome/blob/master/Architecture.md 
+It follows the design guidelines specified here: https://github.com/mqtt-smarthome/mqtt-smarthome/blob/master/Architecture.md
 
 ## ETS export
 
@@ -28,8 +28,8 @@ This tool expects a '3-level' hierarchy.
 
 `blueknx2mqtt` publishes messages to MQTT on two topics:
 
-1. `<topicPrefix>/status/0/1/2` 
-2. `<topicPrefix>/status/main/middle/sub` 
+1. `<topicPrefix>/status/0/1/2`
+2. `<topicPrefix>/status/main/middle/sub`
 
 The `topicPrefix` is by default 'knx', but it can be configured if required.
 
@@ -50,7 +50,7 @@ middle              |   ...
 sub                 |   ...
 dpt                 |   Datapoint type of GA if provided in ETS export, not present otherwise
 val                 |   Translated value of the KNX data (if DPT known through the ETS export), or
-                    |   raw binary data as hex string (e.g., 0x07A4)
+&nbsp;              |   raw binary data as hex string (e.g., 0x07A4)
 raw                 |   "true" if value is a raw hex string, not present otherwise
 response            |   "true" if this was a RESPONSE to a read request, not present otherwise
 
@@ -90,7 +90,7 @@ Example of message object in case the ETS export contains no information about t
 `blueknx2mqtt` listens to the following MQTT topics:
 
 1. `<topicPrefix>/<command>/0/1/2`
-2. `<topicPrefix>/<command>/main/middle/sub`  
+2. `<topicPrefix>/<command>/main/middle/sub`
 
 The following `commands` are supported:
 
@@ -112,7 +112,7 @@ Type        |   Example     |   Explanation
 ----        |   ----        |   -----------
 **raw**     |   "0x01+1"    |   Binary data as hex string, together with the actual length, separated with '+'. This example sends a single bit to KNX with value '1'.
 **raw**     |   "0x07A4+16" |   Sends a 16 bit value to KNX.
-**raw**     |   "0x07"      |   If no bitlength is provided, the full byte value is sent. This example sends an 8 bit value to KNX. 
+**raw**     |   "0x07"      |   If no bitlength is provided, the full byte value is sent. This example sends an 8 bit value to KNX.
 **simple**  |   "10.5"      |   Provided value is translated using the DPT from the ETS export. If no DPT is known, no message is sent.
 
 **Important:** Raw hexadecimal strings must indicate a *byte* array, so number of hexadecimal characters must be *even*.
