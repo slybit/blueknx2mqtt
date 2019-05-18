@@ -51,7 +51,8 @@ sub                 |   ...
 dpt                 |   Datapoint type of GA if provided in ETS export, not present otherwise
 val                 |   Translated value of the KNX data (if DPT known through the ETS export), or
                     |   raw binary data as hex string (e.g., 0x07A4)
-raw                 |   "true" if value is a raw hex string, not present otherwise   
+raw                 |   "true" if value is a raw hex string, not present otherwise
+response            |   "true" if this was a RESPONSE to a read request, not present otherwise
 
 **Important:** The "value" of binary data is translated to "1" or "0" for all Datapoint Types in the DPT1 category.
 
