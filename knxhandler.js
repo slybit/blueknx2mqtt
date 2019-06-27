@@ -40,9 +40,12 @@ KnxHandler.prototype.handleKNXEvent = function(evt, src, dst, value) {
 
 KnxHandler.prototype.updatePrev = function(payload, apdu) {
     let info = this.map.GAToPrev.get(payload.dstgad);
+
     if (info === undefined) {
-        this.map.GAToPrev.set(payload.dstgad, {'prev': undefined, 'lastChange': undefined} );
+        info = {'prev': undefined, 'lastChange': undefined};
+        this.map.GAToPrev.set(payload.dstgad, info);
     }
+
     if ((info.prev === undefined) || (info.prev !== undefined && !info.prev.equals(apdu))) {
         info.lastChange = (new Date).getTime();
         info.prev = apdu;
@@ -54,6 +57,7 @@ KnxHandler.prototype.enrichPayload = function(payload, apdu) {
     // time stamps
     payload.lc = this.updatePrev(payload, apdu);
     payload.ts = (new Date).getTime();
+
     // value
     let info = this.map.GAToname.get(payload.dstgad);
     if (info === undefined) {
