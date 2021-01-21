@@ -5,11 +5,11 @@ knx:
     etsExport: 'etsexport.csv'
     # Configuration passed to the KNX library
     options:
-      ipAddr: '192.168.1.150'
+      ipAddr: '192.168.1.6'
       ipPort: 3671
 mqtt:
     # URL to MQTT broker
-    url: 'mqtt://192.168.1.200'
+    url: 'mqtt://jules.home'
     # Configuration passed to the MQTT library
     options:
         username: 'mqtt_username'

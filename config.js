@@ -5,7 +5,7 @@ exports.parse = function () {
     const file = process.env.KNX_MQTT_CONFIG || 'config.yaml';
     if (fs.existsSync(file)) {
         try {
-          return yaml.safeLoad(fs.readFileSync(file, 'utf8'));
+          return yaml.load(fs.readFileSync(file, 'utf8'));
         } catch (e) {
           console.log(e);
           process.exit();

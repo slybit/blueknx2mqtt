@@ -15,7 +15,7 @@ const logger = createLogger({
       format.splat(),
       format.simple(),
     ),
-    transports: [new transports.Console()]
+    transports: [new transports.Console({'timestamp':true})]
 });
 
 // Add last will to mqtt.options
@@ -52,8 +52,8 @@ let knxConnection = knx.Connection(Object.assign({
         disconnected: function() {
             logger.warn('KNX disconnected');
             knxConnection._state = "1";
-            publishKnxState(knxConnection._state);
-            knxConnection.transition('connecting');
+            //publishKnxState(knxConnection._state);
+            //knxConnection.transition('connecting');
         }
   }}, config.knx.options))
 
