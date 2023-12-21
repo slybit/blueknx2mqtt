@@ -105,8 +105,12 @@ setTimeout(function() {
 /*
  * Kind of hacky way to keep knx.js reconnecting. This will no longer be required once my pull request has been approved in the knx.js library.
  * Checks every 30 seconds if the knx.js is still connected. If not, it forces a reconnect attempt.
+ *
+ * REMOVED in version 0.5
  */
+/*
 var timerID = setInterval(function() {
     if (knxConnection.state === 'uninitialized')
         knxConnection.emit('disconnected');
 }, 30000);
+*/
