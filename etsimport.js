@@ -3,6 +3,8 @@
 * nameToGA and GAToInfo
 */
 
+const { logger, logToES } = require('./standardlogger.js');
+
 const fs = require('fs');
 const dptRegExp = new RegExp('DPS?T\\-(\\d+)(\\-(\\d+))?');
 
@@ -17,7 +19,7 @@ function parseDPT(dpt) {
     }
 }
 
-exports.parse = function (etsFile, logger) {
+exports.parse = function (etsFile) {
     var map = {};
     map.nameToGA = new Map();
     map.GAToname = new Map();
@@ -46,7 +48,10 @@ exports.parse = function (etsFile, logger) {
                 var name = main+"/"+middle+"/"+sub;
                 var ga = data[3].slice(1,-1);
                 var dpt = parseDPT(data[7].slice(1,-1));
-                if (!dpt) logger.warn("Unrecognized datapoint [%s] for GA %s", dpt, ga);
+                if (!dpt) {
+                    logger.warn("Unrecognized datapoint [%s] for GA %s", dpt, ga);
+                    logToES("warn", {dpt, ga}, "Unrecognized datapoint");
+                }
                 map.nameToGA.set(name, ga);
                 map.GAToname.set(ga, {'main': main, "middle": middle, "sub": sub, 'dpt': dpt} );
                 map.GAToPrev.set(ga, {'prev': undefined, 'lastChange': undefined} );

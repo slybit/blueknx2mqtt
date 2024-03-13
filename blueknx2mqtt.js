@@ -1,22 +1,13 @@
 'use strict'
 
 const knx = require('knx');
-const { createLogger, format, transports } = require('winston');
 const config = require('./config.js').parse();
 const mqtt = require('mqtt');
 const KnxHandler = require('./knxhandler');
 const MqttHandler = require('./mqtthandler');
+const { logger, logToES } = require('./standardlogger.js');
 
-// Initate the logger
-const logger = createLogger({
-    level: config.loglevel,
-    format: format.combine(
-      format.colorize(),
-      format.splat(),
-      format.simple(),
-    ),
-    transports: [new transports.Console({'timestamp':true})]
-});
+
 
 // Add last will to mqtt.options
 if (!mqtt.options) mqtt.options = {};
@@ -37,6 +28,7 @@ let knxConnection = knx.Connection(Object.assign({
     handlers: {
         connected: function() {
             logger.info('KNX connected');
+            logToES('info', {}, 'KNX connected');
             knxConnection._state = "2";
             publishKnxState(knxConnection._state);
         },
@@ -45,23 +37,26 @@ let knxConnection = knx.Connection(Object.assign({
         },
         error: function(msg) {
             logger.warn('KNX disconnected');
+            logToES('warn', {}, 'KNX connected');
             knxConnection._state = "1";
             publishKnxState(knxConnection._state);
             knxConnection.transition('connecting');
         },
         disconnected: function() {
             logger.warn('KNX disconnected');
+            logToES('warn', {}, 'KNX connected');
             knxConnection._state = "1";
             //publishKnxState(knxConnection._state);
             //knxConnection.transition('connecting');
         }
   }}, config.knx.options))
 
-let knxHandler = new KnxHandler(config, map, mqttClient, logger);
-let mqttHandler = new MqttHandler(config, map, knxConnection, logger);
+let knxHandler = new KnxHandler(config, map, mqttClient);
+let mqttHandler = new MqttHandler(config, map, knxConnection);
 
 mqttClient.on('connect', function () {
     logger.info('MQTT connected');
+    logToES('info', {}, 'MQTT connected');
     mqttClient.subscribe(config.mqtt.topicPrefix + '/write/+/+/+');
     mqttClient.subscribe(config.mqtt.topicPrefix + '/read/+/+/+');
     mqttClient.subscribe(config.mqtt.topicPrefix + '/get/+/+/+');
@@ -75,10 +70,12 @@ mqttClient.on('connect', function () {
 
 mqttClient.on('close', function () {
     logger.warn('MQTT disconnected');
+    logToES('warn', {}, 'MQTT disconnected');
 });
 
 mqttClient.on('reconnect', function () {
-    logger.info('MQTT trying to reconnect');
+    logger.warn('MQTT trying to reconnect');
+    logToES('warn', {}, 'MQTT trying to reconnect');
 });
 
 mqttClient.on('message', function (topic, message) {

@@ -1,5 +1,22 @@
 # One of 'error', 'warn', 'info', 'verbose', debug', 'silly'
-loglevel: 'verbose'
+# One of 'error', 'warn', 'info', 'verbose', debug', 'silly'
+loglevel: 'debug'
+ESlogging:
+    enabled: true
+    label: BLUEKNX2MQTT
+    loglevel: warn
+    options:
+        indexPrefix: logs
+        clientOpts:
+            node: http://es.elastic.home
+KNXESlogging:
+    enabled: true
+    label: BLUEKNX2MQTT
+    loglevel: info
+    options:
+        indexPrefix: knx
+        clientOpts:
+            node: http://es.elastic.home
 knx:
     # ETS exported group addresses
     etsExport: 'etsexport.csv'
