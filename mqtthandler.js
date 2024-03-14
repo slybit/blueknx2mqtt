@@ -49,25 +49,25 @@ MqttHandler.prototype.handleMqttEvent = function(topic, message) {
                 let buffer = Buffer.from(parts[2], 'hex');
                 let bitlength = parts[4] ? parts[4] : buffer.length * 8;
                 this.knxConnection.writeRaw(gad, buffer, bitlength);
-                logger.debug("MQTT->KNX: Writing RAW message to KNX", {gad, message});
+                logger.debug("MQTT->KNX: Writing RAW message to KNX", {gad, 'message' : message});
                 }
             else if(info && info.dpt) {
                 this.knxConnection.write(gad, message, info.dpt);
-                logger.debug("MQTT->KNX: Writing message to KNX", {gad, message});
+                logger.debug("MQTT->KNX: Writing message to KNX", {gad, 'message' : message});
             } else {
-                logger.error('MQTT in: unknown DPT for GAD and provided data is not in hex', {gad, message});
+                logger.error('MQTT in: unknown DPT for GAD and provided data is not in hex', {gad, 'message' : message});
                 return;
             }
             break;
         case "read":
         case "get":
             this.knxConnection.read(gad);
-            logger.debug("MQTT->KNX: Reading from KNX:  %s", gad);
+            logger.debug("MQTT->KNX: Reading from KNX", {gad});
             break;
         case "toggle":
             // in case of toggle, the message is supposed to be the state Group Address
             if (!gadRexExp.exec(message)) {
-                logger.warn('MQTT in: "toggle" command without valid state Group Address', {message});
+                logger.warn('MQTT in: "toggle" command without valid state Group Address', {'message' : message});
                 return;
             }
             let prev = this.map.GAToPrev.get(message).prev;
