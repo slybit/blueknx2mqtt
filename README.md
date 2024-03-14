@@ -49,9 +49,9 @@ main                |   Main level GA name if provided in ETS export, not presen
 middle              |   ...
 sub                 |   ...
 dpt                 |   Datapoint type of GA if provided in ETS export, not present otherwise
-val                 |   Translated value of the KNX data (if DPT known through the ETS export), or
-&nbsp;              |   raw binary data as hex string (e.g., 0x07A4)
-raw                 |   "true" if value is a raw hex string, not present otherwise
+val                 |   Translated value of the KNX data (if DPT known through the ETS export), or empty
+hex                 |   HEX representation of the KNX data in case DPT is not known
+raw                 |   "true" if 'val' is empty and 'hex' is used, not present otherwise
 response            |   "true" if this was a RESPONSE to a read request, not present otherwise
 
 **Important:** The "value" of binary data is translated to "1" or "0" for all Datapoint Types in the DPT1 category.
@@ -78,7 +78,7 @@ Example of message object in case the ETS export contains no information about t
     'dstgad'    :   '0/1/2',
     'ts'        :   1543434592311,
     'lc'        :   1543434590311,
-    'val'       :   '0x01',
+    'hex'       :   '0x01',
     'raw'       :   'true'
 }
 ```
