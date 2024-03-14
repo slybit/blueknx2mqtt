@@ -19,22 +19,33 @@ const DEFAULT_CONFIG = {
 // merge default with the one from the config file
 const config = Object.assign({}, DEFAULT_CONFIG, require('./config.js').parse());
 
+// this will remove "val" if it is not a number and
+// replace it with strval instead
+// this to avoid issues in ES with the val field having 2 different types (number and string)
+const fixVal = winston.format((info) => {
+    if (info.val && isNaN(info.val)) {
+        let {val, ...rest} = info;
+        rest.strval = val.toString();
+        return rest;
+    } else {
+        return info;
+    }
+})();
+
 const esTransportOpts = {
-    format: combine(splat()),
     ...config.KNXESlogging.options
 };
 
-const ESlogger = winston.createLogger({
-    level: config.KNXESlogging.loglevel,
+const KNXESlogger = winston.createLogger({
+    level: 'info',
+    format: combine(fixVal),
     transports: [
         new ElasticsearchTransport(esTransportOpts)
     ],
 });
 
-const logKNXToES = (level, meta, ...splat) => {
-    if (!config.KNXESlogging.enabled) return;
-    let _meta = meta ? {"label": config.KNXESlogging.label, ...meta} : {"label": config.KNXESlogging.label};
-    ESlogger.log(level, ...splat, _meta);
+const logKNXToES = ( data ) => {
+    KNXESlogger.info("knx", data);
 }
 
 module.exports = { logKNXToES };

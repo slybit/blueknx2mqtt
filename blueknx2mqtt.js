@@ -5,7 +5,7 @@ const config = require('./config.js').parse();
 const mqtt = require('mqtt');
 const KnxHandler = require('./knxhandler');
 const MqttHandler = require('./mqtthandler');
-const { logger, logToES } = require('./standardlogger.js');
+const { logger } = require('./standardlogger.js');
 
 
 
@@ -19,7 +19,7 @@ const map = require('./etsimport.js').parse(config.knx.etsExport, logger);
 
 let publishKnxState = function(state) {
     mqttClient.publish(config.mqtt.topicPrefix + "/connected", state, {'retain' : true});
-    logger.info('published connected state: %s', state);
+    logger.info('published connected state', {state});
 }
 
 let mqttClient = mqtt.connect(config.mqtt.url, config.mqtt.options);
@@ -28,7 +28,6 @@ let knxConnection = knx.Connection(Object.assign({
     handlers: {
         connected: function() {
             logger.info('KNX connected');
-            logToES('info', {}, 'KNX connected');
             knxConnection._state = "2";
             publishKnxState(knxConnection._state);
         },
@@ -37,14 +36,12 @@ let knxConnection = knx.Connection(Object.assign({
         },
         error: function(msg) {
             logger.warn('KNX disconnected');
-            logToES('warn', {}, 'KNX connected');
             knxConnection._state = "1";
             publishKnxState(knxConnection._state);
             knxConnection.transition('connecting');
         },
         disconnected: function() {
             logger.warn('KNX disconnected');
-            logToES('warn', {}, 'KNX connected');
             knxConnection._state = "1";
             //publishKnxState(knxConnection._state);
             //knxConnection.transition('connecting');
@@ -56,7 +53,6 @@ let mqttHandler = new MqttHandler(config, map, knxConnection);
 
 mqttClient.on('connect', function () {
     logger.info('MQTT connected');
-    logToES('info', {}, 'MQTT connected');
     mqttClient.subscribe(config.mqtt.topicPrefix + '/write/+/+/+');
     mqttClient.subscribe(config.mqtt.topicPrefix + '/read/+/+/+');
     mqttClient.subscribe(config.mqtt.topicPrefix + '/get/+/+/+');
@@ -70,12 +66,10 @@ mqttClient.on('connect', function () {
 
 mqttClient.on('close', function () {
     logger.warn('MQTT disconnected');
-    logToES('warn', {}, 'MQTT disconnected');
 });
 
 mqttClient.on('reconnect', function () {
     logger.warn('MQTT trying to reconnect');
-    logToES('warn', {}, 'MQTT trying to reconnect');
 });
 
 mqttClient.on('message', function (topic, message) {

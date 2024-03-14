@@ -1,18 +1,15 @@
 # One of 'error', 'warn', 'info', 'verbose', debug', 'silly'
-# One of 'error', 'warn', 'info', 'verbose', debug', 'silly'
-loglevel: 'debug'
+loglevel: debug
 ESlogging:
     enabled: true
     label: BLUEKNX2MQTT
-    loglevel: warn
+    loglevel: info
     options:
         indexPrefix: logs
         clientOpts:
             node: http://es.elastic.home
 KNXESlogging:
     enabled: true
-    label: BLUEKNX2MQTT
-    loglevel: info
     options:
         indexPrefix: knx
         clientOpts:

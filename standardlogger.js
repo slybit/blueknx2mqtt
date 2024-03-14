@@ -21,57 +21,39 @@ const DEFAULT_CONFIG = {
 const config = Object.assign({}, DEFAULT_CONFIG, require('./config.js').parse());
 
 
-
-//
-//Font styles: bold, dim, italic, underline, inverse, hidden, strikethrough.
-//Font foreground colors: black, red, green, yellow, blue, magenta, cyan, white, gray, grey.
-//Background colors: blackBG, redBG, greenBG, yellowBG, blueBG magentaBG, cyanBG, whiteBG
-//
-winston.addColors({
-    error: 'bold white redBG',
-    warn: 'yellow',
-    info: 'blue',
-    verbose: 'white',
-    silly: 'white',
-    debug: 'green',
-});
+const addLabel = winston.format((info) => {
+    return {"label": config.ESlogging.label, ...info};
+})();
 
 
 const consoleFormat = combine(
-    colorize({ all: true }),
-    splat(),
     timestamp({
         format: 'YYYY-MM-DD HH:mm:ss',
     }),
-    align(),
-    printf((info) => `[${info.timestamp}] ${info.level}  ${info.message}`)
+    printf((info) => {
+        let { timestamp, level, message, ...leftovers } = info;
+        return `[${info.timestamp}] ${info.level.padEnd(7).toUpperCase()} | ${message} | ${JSON.stringify(leftovers)}`;
+    })
 );
 
-const logger = winston.createLogger({
-    level: config.loglevel,
-    transports: [
-        new winston.transports.Console({
-            format: consoleFormat
-        })
-    ],
-});
+
 
 const esTransportOpts = {
-    format: combine(splat()),
+    format: combine(addLabel),
+    level: config.ESlogging.loglevel,
     ...config.ESlogging.options
 };
+const esTransport = new winston.transports.Elasticsearch(esTransportOpts);
 
-const ESlogger = winston.createLogger({
-    level: config.ESlogging.loglevel,
+
+const logger = winston.createLogger({
     transports: [
-        new ElasticsearchTransport(esTransportOpts)
+        new winston.transports.Console({
+            level: config.loglevel,
+            format: consoleFormat
+        }),
+        esTransport
     ],
 });
 
-const logToES = (level, meta, ...splat) => {
-    if (!config.ESlogging.enabled) return;
-    let _meta = meta ? {"label": config.ESlogging.label, ...meta} : {"label": config.ESlogging.label};
-    ESlogger.log(level, ...splat, _meta);
-}
-
-module.exports = { logger, logToES };
+module.exports = { logger };

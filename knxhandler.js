@@ -1,5 +1,5 @@
 const DPTLib = require('knx/src/dptlib');
-const { logger, logToES } = require('./standardlogger.js');
+const { logger } = require('./standardlogger.js');
 const { logKNXToES } = require('./knxESlogger.js');
 
 function KnxHandler(config, map, mqttClient) {
@@ -16,9 +16,7 @@ function KnxHandler(config, map, mqttClient) {
 
 
 KnxHandler.prototype.handleKNXEvent = function (evt, src, dst, value) {
-    logger.debug("onKnxEvent %s, %s, %j", evt, dst, value);
-    logToES("debug", { evt, dst, value }, "onKnxEvent");
-
+    logger.debug("onKnxEvent", { evt, dst, value });
     let payload = {
         'evt': evt,
         'srcphy': src,
@@ -36,32 +34,25 @@ KnxHandler.prototype.handleKNXEvent = function (evt, src, dst, value) {
     if (evt === 'GroupValue_Write' || evt === 'GroupValue_Response') {
         this.translateValue(payload, value, info);
         if (payload.raw) {
-            logger.warn("KNX->MQTT: Unknown DPT for evt: %s, src: %s, dst: %s, value: %s", evt, src, dst, payload.hex);
-            logToES("debug", { payload }, "KNX->MQTT: Unknown DPT");
+            logger.warn("KNX->MQTT: Unknown DPT", { payload });
         }
     }
-
-
 
     //if (evt === 'GroupValue_Response') payload.response = true;
     // Only create an MQTT 'status' message for either Write's or Response's
     if (evt === 'GroupValue_Write' || evt === 'GroupValue_Response') {
-
-
         let mqttMessage = JSON.stringify(payload);
         this.mqttClient.publish(this.config.mqtt.topicPrefix + "/status/" + dst, mqttMessage, { 'retain': true });
-        logger.debug("KNX->MQTT: Published to %s, msg: %s", this.config.mqtt.topicPrefix + "/status/" + dst, mqttMessage);
-        logToES("debug", { topic: this.config.mqtt.topicPrefix + "/status/" + dst, mqttMessage }, "KNX->MQTT: Published");
+        logger.debug("KNX->MQTT: Published message", { topic: this.config.mqtt.topicPrefix + "/status/" + dst, payload });
         if (payload.sub) {
             let topic = this.config.mqtt.topicPrefix + "/status/" + payload.main + "/" + payload.middle + "/" + payload.sub;
             this.mqttClient.publish(topic, mqttMessage, { 'retain': true });
-            logger.debug("KNX->MQTT: Published to %s, msg: %s", topic, mqttMessage);
-            logToES("debug", { topic, mqttMessage }, "KNX->MQTT: Published");
+            logger.debug("KNX->MQTT: Published message", { topic, payload });
         }
     }
 
     // Publish to ES
-    logKNXToES("info", payload, "knx");
+    logKNXToES(payload);
 }
 
 KnxHandler.prototype.updatePrev = function (payload, apdu) {
